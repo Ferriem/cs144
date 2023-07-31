@@ -1,0 +1,47 @@
+Test project /root/ferriem/cs144/minnow/build
+      Start  1: compile with bug-checkers
+ 1/29 Test  #1: compile with bug-checkers ........   Passed    0.47 sec
+      Start  3: byte_stream_basics
+ 2/29 Test  #3: byte_stream_basics ...............   Passed    0.01 sec
+      Start  4: byte_stream_capacity
+ 3/29 Test  #4: byte_stream_capacity .............   Passed    0.01 sec
+      Start  5: byte_stream_one_write
+ 4/29 Test  #5: byte_stream_one_write ............   Passed    0.01 sec
+      Start  6: byte_stream_two_writes
+ 5/29 Test  #6: byte_stream_two_writes ...........   Passed    0.01 sec
+      Start  7: byte_stream_many_writes
+ 6/29 Test  #7: byte_stream_many_writes ..........   Passed    2.04 sec
+      Start  8: byte_stream_stress_test
+ 7/29 Test  #8: byte_stream_stress_test ..........   Passed    0.39 sec
+      Start  9: reassembler_single
+ 8/29 Test  #9: reassembler_single ...............   Passed    0.01 sec
+      Start 10: reassembler_cap
+ 9/29 Test #10: reassembler_cap ..................   Passed    0.01 sec
+      Start 11: reassembler_seq
+10/29 Test #11: reassembler_seq ..................   Passed    0.07 sec
+      Start 12: reassembler_dup
+11/29 Test #12: reassembler_dup ..................   Passed    0.95 sec
+      Start 13: reassembler_holes
+12/29 Test #13: reassembler_holes ................   Passed    0.01 sec
+      Start 14: reassembler_overlapping
+13/29 Test #14: reassembler_overlapping ..........   Passed    0.01 sec
+      Start 15: reassembler_win
+14/29 Test #15: reassembler_win ..................   Passed    5.04 sec
+      Start 16: wrapping_integers_cmp
+15/29 Test #16: wrapping_integers_cmp ............   Passed    0.20 sec
+      Start 17: wrapping_integers_wrap
+16/29 Test #17: wrapping_integers_wrap ...........   Passed    0.01 sec
+      Start 18: wrapping_integers_unwrap
+17/29 Test #18: wrapping_integers_unwrap .........   Passed    0.01 sec
+      Start 19: wrapping_integers_roundtrip
+18/29 Test #19: wrapping_integers_roundtrip ......***Failed    0.17 sec
+Testing Wrap32::wrap() and Wrap32::unwrap()...
+Not implemented yet.
+
+
+94% tests passed, 1 tests failed out of 18
+
+Total Test time (real) =   9.45 sec
+
+The following tests FAILED:
+	 19 - wrapping_integers_roundtrip (Failed)
