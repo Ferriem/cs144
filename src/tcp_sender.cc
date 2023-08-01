@@ -63,10 +63,9 @@ void TCPSender::push( Reader& outbound_stream )
       timer = 0;
     }
     message_queue.push(message);
-    out_seqno += message.sequence_length();
     sent_messages.insert({next_abs_seqno, message});
     next_abs_seqno += message.sequence_length();
-    
+    out_seqno += message.sequence_length();
     if(message.FIN){
       break;
     }
@@ -105,16 +104,16 @@ void TCPSender::receive( const TCPReceiverMessage& msg )
   window_size = msg.window_size;
 }
 
-void TCPSender::tick( const size_t ms_since_last_tick )
-{
-  timer += ms_since_last_tick;
-  if(timer >= RTO_ms_ && !sent_messages.empty()){
-    auto &[seqno, message] = *sent_messages.begin();
-    message_queue.push(message);
-    consecutive_retransmissions_++;
-    if(window_size){
-      RTO_ms_ *= 2;
+void TCPSender::tick(const size_t ms_since_last_tick) {
+    timer += ms_since_last_tick;
+    auto iter = sent_messages.begin();
+    if (timer >= RTO_ms_ && iter != sent_messages.end()) {
+        const auto &[abs_seqno, segment] = *iter;
+        if (window_size > 0) {
+            RTO_ms_ *= 2;
+        }
+        timer = 0;
+        consecutive_retransmissions_++;
+        message_queue.push(segment);
     }
-    timer = 0;
-  }
 }
