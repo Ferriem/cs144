@@ -93,7 +93,7 @@ void TCPSender::receive( const TCPReceiverMessage& msg )
         out_seqno -= message.sequence_length();
         iter = sent_messages.erase(iter);
         RTO_ms_ = initial_RTO_ms_;
-        if(!message_queue.empty()){
+        if(!sent_messages.empty()){
           timer = 0;
         }
       }else{
