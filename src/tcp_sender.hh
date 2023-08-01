@@ -9,7 +9,7 @@ class TCPSender
 {
   Wrap32 isn_;
   uint64_t initial_RTO_ms_;
-  uint64_t RTO_ms_ {initial_RTO_ms_};
+  uint64_t RTO_ms_ {0};
   uint64_t timer {0};
   bool set_syn {false};
   bool set_fin {false};
