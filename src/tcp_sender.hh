@@ -11,8 +11,8 @@ class TCPSender
   uint64_t initial_RTO_ms_;
   uint64_t RTO_ms_ {initial_RTO_ms_};
   uint64_t timer {0};
-  bool set_syn {};
-  bool set_fin {};
+  bool set_syn {false};
+  bool set_fin {false};
   uint64_t window_size {1};
   uint64_t out_seqno {0};
   uint64_t next_abs_seqno {0};

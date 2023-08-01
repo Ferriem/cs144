@@ -28,7 +28,6 @@ int main()
       test.execute( ExpectAckno { Wrap32 { isn + 13 } } );
       test.execute( ExpectWindow { cap - 12 } );
     }
-    printf("h\n");
     {
       const size_t cap = 4000;
       const uint32_t isn = 23452;
