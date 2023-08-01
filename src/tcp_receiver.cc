@@ -22,8 +22,7 @@ TCPReceiverMessage TCPReceiver::send( const Writer& inbound_stream ) const
 {
   // Your code here.
   TCPReceiverMessage message {};
-  uint16_t const window_size
-    = inbound_stream.available_capacity() > UINT16_MAX ? UINT16_MAX : inbound_stream.available_capacity();
+  uint16_t const window_size = inbound_stream.available_capacity() > UINT16_MAX ? UINT16_MAX : inbound_stream.available_capacity();
   if ( !isn_set ) {
     return { std::optional<Wrap32> {}, window_size };
   }
