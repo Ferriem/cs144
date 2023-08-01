@@ -27,58 +27,50 @@ optional<TCPSenderMessage> TCPSender::maybe_send()
   // Your code here.
   if(set_syn && !message_queue.empty()){
     TCPSenderMessage message;
-    message = std::move(message_queue.front());
+    message = message_queue.front();
     message_queue.pop();
     return message;
   }
   return nullopt;
 }
 
-void TCPSender::push(Reader &outbound_stream) {
-    const uint64_t curr_window_size = window_size ? window_size : 1;
-    while (curr_window_size > out_seqno) {
-        TCPSenderMessage msg;
-
-        if (!set_syn) {
-            msg.SYN = true;
-            set_syn = true;
-        }
-
-        msg.seqno = get_next_seqno();
-        const uint64_t payload_size
-                = min(TCPConfig::MAX_PAYLOAD_SIZE, curr_window_size - out_seqno - msg.SYN);
-        std::string payload = std::string(outbound_stream.peek()).substr(0, payload_size);
-        outbound_stream.pop(payload_size);
-
-        if (!set_fin && outbound_stream.is_finished()
-            && payload.size() + out_seqno + msg.SYN < curr_window_size) {
-            msg.FIN = true;
-            set_fin = true;
-        }
-
-        msg.payload = Buffer(std::move(payload));
-
-        // no data, stop sending
-        if (msg.sequence_length() == 0) {
-            break;
-        }
-
-        // no outstanding segments, restart timer
-        if (message_queue.empty()) {
-            RTO_ms_ = initial_RTO_ms_;
-            timer = 0;
-        }
-
-        message_queue.push(msg);
-
-        out_seqno += msg.sequence_length();
-        sent_messages.insert(std::make_pair(next_abs_seqno, msg));
-        next_abs_seqno += msg.sequence_length();
-
-        if (msg.FIN) {
-            break;
-        }
+void TCPSender::push( Reader& outbound_stream )
+{
+  uint64_t current_window_size = window_size ? window_size : 1;
+  while(current_window_size > out_seqno){
+    TCPSenderMessage message;
+    if(!set_syn){
+      message.SYN = true;
+      set_syn = true;
     }
+    message.seqno = get_next_seqno();
+    uint64_t payload_size = min(TCPConfig::MAX_PAYLOAD_SIZE, current_window_size - out_seqno - message.SYN);
+    std::string payload = std::string(outbound_stream.peek()).substr(0, payload_size);
+    outbound_stream.pop(payload_size);
+
+    if(!set_fin && outbound_stream.is_finished() && payload.size() + message.SYN + out_seqno < current_window_size){
+      set_fin = true;
+      message.FIN = true;
+    }
+    
+    message.payload = Buffer(std::move(payload));
+
+    if(message.sequence_length() == 0){
+      break;
+    }
+    if(sent_messages.empty()){
+      RTO_ms_ = initial_RTO_ms_;
+      timer = 0;
+    }
+    message_queue.push(message);
+
+    sent_messages.insert({next_abs_seqno, message});
+    next_abs_seqno += message.sequence_length();
+    out_seqno += message.sequence_length();
+    if(message.FIN){
+      break;
+    }
+  }
 }
 
 TCPSenderMessage TCPSender::send_empty_message() const
