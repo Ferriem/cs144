@@ -1,31 +1,59 @@
-Checkpoint 2 Writeup
-====================
+## Check-2
 
-My name: [your name here]
+[check2.pdf](https://cs144.github.io/assignments/check2.pdf)
 
-My SUNet ID: [your sunetid here]
+### Translate between 64-bit indexes and 32-bit seqnos
 
-I collaborated with: [list sunetids here]
+- In the TCP headers, each byte's index in the stream is represented with a 32-bit seqno.
+- TCP sequence numbers start at a random value.
+- The logical beginning and ending each occupy one sequence number.
 
-I would like to thank/reward these classmates for their help: [list sunetids here]
+|    element     |    SYN    |     c     |  a   |  t   | FIN  |
+| :------------: | :-------: | :-------: | :--: | :--: | :--: |
+|     seqno      | 2^32^ - 2 | 2^32^ - 1 |  0   |  1   |  2   |
+| absolute seqno |     0     |     1     |  2   |  3   |  4   |
+|  stream index  |           |     0     |  1   |  2   |      |
 
-This lab took me about [n] hours to do. I [did/did not] attend the lab session.
+- **Target**: Implement the functions below:
 
-Program Structure and Design of the TCPReceiver and wrap/unwrap routines:
-[]
+  ```c++
+  static Wrap32 Wrap32::wrap( uint64_t n, Wrap32 zero_point)
+    //Convert absolute seqno(n) to seqno. 
+    //zero_point is ISN
+  uint64 t unwrap( Wrap32 zero point, uint64 t checkpoint ) const
+    //find the nearest absolute sequence number to the checkpoint	
+  ```
 
-Implementation Challenges:
-[]
+- `wrap`: simple return `zeropoint + n`, we should notice the data shouldn't overwhelm `uint32_t` so do something more.
+- `unwrap`: find the nearest, first check the offset between now and checkpoint. If the offset is just smaller than checkpoint, that means it is the nearest. If not, add a mutiple of 2^32^.
 
-Remaining Bugs:
-[]
+And then you can pass the wrap and unwrap test.
 
-- Optional: I had unexpected difficulty with: [describe]
+### TCP receiver
 
-- Optional: I think you could make this lab better by: [describe]
+- **Target**: Implement the functions below:
 
-- Optional: I was surprised by: [describe]
+  ```c++
+  void TCPReceiver::receive( TCPSenderMessage message, Reassembler& reassembler, Writer& inbound_stream )
+    //receive the message from TCPSender and write it to reassembler
+    
+  TCPReceiverMessage TCPReceiver::send( const Writer& inbound_stream ) const
+   	//Generate a message send to TCPReceiver which contains the window_size and ackno direct to the next expect number.
+  ```
 
-- Optional: I'm not sure about: [describe]
+- Create a private variable in class `Receiver` which indicates isn.
 
-- Optional: I made an extra test I think will be helpful in catching bugs: [describe where to find]
+  ```c++
+  bool isn_set { false };
+    Wrap32 isn { 0 };
+  ```
+
+- `receive`: Wait until the isn comes, set the `isn_set`, record the isn. `inbound_stream.bytes_pushed` represent the byte has been pushed to the bytestream, and it plus one is the expect number `checkpoint`. And then we get the absolute seqno by `unwrap`. Notice that FIN and ISN take a place in absolute seqno, the corresponding stream index may be `absolute_seq - 1 + SYN`. And then, `insert` the index with the message.
+
+- `send`: If isn has not come yet, return the optional with window_size, if the isn has come, return with an `ackno` indicating the next expect number.
+
+When everything is done, we can pass all the test.
+
+### Problems
+
+​	I used to run the code in docker for mac, but the speed is too slow to pass the test, compile the code in a virtual machine rather than docker!
