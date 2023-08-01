@@ -45,7 +45,7 @@ void TCPSender::push( Reader& outbound_stream )
     }
     message.seqno = get_next_seqno();
     uint64_t payload_size = min(TCPConfig::MAX_PAYLOAD_SIZE, current_window_size - out_seqno - message.SYN);
-    std::string payload = std::string(outbound_stream.peek().substr(0, payload_size));
+    std::string payload = std::string(outbound_stream.peek()).substr(0, payload_size);
     outbound_stream.pop(payload_size);
 
     if(!set_fin && outbound_stream.is_finished() && payload_size + message.SYN + out_seqno < current_window_size){
@@ -94,7 +94,9 @@ void TCPSender::receive( const TCPReceiverMessage& msg )
         out_seqno -= message.sequence_length();
         iter = sent_messages.erase(iter);
         RTO_ms_ = initial_RTO_ms_;
-        timer = 0;
+        if(!message_queue.empty()){
+          timer = 0;
+        }
       }else{
         break;
       }
