@@ -88,29 +88,32 @@ TCPSenderMessage TCPSender::send_empty_message() const
   return message;
 }
 
-void TCPSender::receive( const TCPReceiverMessage& msg )
-{
-  if(msg.ackno.has_value()){
-    uint64_t recv_abs_seqno = msg.ackno.value().unwrap(isn_, next_abs_seqno);
-    if(recv_abs_seqno > next_abs_seqno){
-      return;
-    }
-    for(auto iter = sent_messages.begin(); iter != sent_messages.end();){
-      auto &[seqno, message] = *iter;
-      if(seqno + message.sequence_length() <= recv_abs_seqno){
-        out_seqno -= message.sequence_length();
-        iter = sent_messages.erase(iter);
-        RTO_ms_ = initial_RTO_ms_;
-        if(!message_queue.empty()){
-          timer = 0;
+void TCPSender::receive(const TCPReceiverMessage &msg) {
+    if (!msg.ackno.has_value()) { ; // Don't return directly
+    } else {
+        const uint64_t recv_abs_seqno = msg.ackno.value().unwrap(isn_, next_abs_seqno);
+        if (recv_abs_seqno > next_abs_seqno) {
+            // Impossible, we couldn't transmit future data
+            return;
         }
-      }else{
-        break;
-      }
+
+        for (auto iter = sent_messages.begin(); iter != sent_messages.end();) {
+            const auto &[abs_seqno, segment] = *iter;
+            if (abs_seqno + segment.sequence_length() <= recv_abs_seqno) {
+                out_seqno -= segment.sequence_length();
+                iter = sent_messages.erase(iter);
+                // reset RTO and if outstanding data is not empty, start timer
+                RTO_ms_ = initial_RTO_ms_;
+                if (!message_queue.empty()) {
+                    timer = 0;
+                }
+            } else {
+                break;
+            }
+        }
+        consecutive_retransmissions_ = 0;
     }
-    consecutive_retransmissions_ = 0;
-  }
-  window_size = msg.window_size;
+    window_size = msg.window_size;
 }
 
 void TCPSender::tick( const size_t ms_since_last_tick )
