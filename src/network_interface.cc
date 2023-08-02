@@ -50,7 +50,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
       arp_life.emplace(addr_numeric, ARP_requese_ttl);
     }
   }
-  arp_list.emplace_back(std::pair(next_hop, dgram));
+  arp_list.emplace_back(std::pair{next_hop, dgram});
 }
 
 // frame: the incoming Ethernet frame
