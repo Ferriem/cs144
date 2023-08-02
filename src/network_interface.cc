@@ -20,41 +20,37 @@ NetworkInterface::NetworkInterface( const EthernetAddress& ethernet_address, con
 
 // Note: the Address type can be converted to a uint32_t (raw 32-bit IP address) by using the
 // Address::ipv4_numeric() method.
-void NetworkInterface::send_datagram(const InternetDatagram &dgram, const Address &next_hop) {
-    const uint32_t addr_numeric = next_hop.ipv4_numeric();
+void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Address& next_hop )
+{
+  uint32_t addr_numeric = next_hop.ipv4_numeric();
 
-    /* ARP Table has stored the mapping info, we send the datagram directly */
-    if (arp_table.contains(addr_numeric)) {
-        EthernetFrame eth_frame;
-        eth_frame.header.src = ethernet_address_;
-        eth_frame.header.dst = arp_table.at(addr_numeric).eth_addr;
-        eth_frame.header.type = EthernetHeader::TYPE_IPv4;
-        eth_frame.payload = serialize(dgram);
-        outbound_frames.push(eth_frame);
-    } else {
-        /* ARP Table has no such mapping and we haven't send an ARP request for target ip */
-        if (arp_life.find(addr_numeric) == arp_life.end()) {
-            // next hop ipv4 addr is not contained in the arp requests waiting list
-            ARPMessage arp_msg;
-            arp_msg.opcode = ARPMessage::OPCODE_REQUEST;
-            arp_msg.sender_ip_address = ip_address_.ipv4_numeric();
-            arp_msg.sender_ethernet_address = ethernet_address_;
-            arp_msg.target_ip_address = addr_numeric;
-            arp_msg.target_ethernet_address = {/* empty */};
+  if(arp_table.contains(addr_numeric)){
+    EthernetFrame eth_frame;
+    eth_frame.header.src = ethernet_address_;
+    eth_frame.header.dst = arp_table.at(addr_numeric).eth_addr;
+    eth_frame.header.type = EthernetHeader::TYPE_IPv4;
+    eth_frame.payload = serialize(dgram);
+    outbound_frames.push(eth_frame);
+  }else{
+    if(arp_life.find(addr_numeric) == arp_life.end()){
+      ARPMessage arp_msg;
+      arp_msg.opcode = ARPMessage::OPCODE_REQUEST;
+      arp_msg.sender_ethernet_address = ethernet_address_;
+      arp_msg.sender_ip_address = ip_address_.ipv4_numeric();
+      arp_msg.target_ethernet_address = {};
+      arp_msg.target_ip_address = addr_numeric;
 
-            EthernetFrame arp_eth_frame;
-            arp_eth_frame.header.src = ethernet_address_;
-            arp_eth_frame.header.dst = ETHERNET_BROADCAST;
-            arp_eth_frame.header.type = EthernetHeader::TYPE_ARP;
-            arp_eth_frame.payload = serialize(arp_msg);
-            outbound_frames.push(arp_eth_frame);
-
-            arp_life.emplace(std::make_pair(addr_numeric, ARP_requese_ttl));
-        }
-        // We need to store the datagram in the list. After we know the eth addr, we can queue
-        // the corresponding dgrams.
-        arp_list.emplace_back(std::pair{next_hop, dgram});
+      EthernetFrame arp_eth_frame;
+      arp_eth_frame.header.src = ethernet_address_;
+      arp_eth_frame.header.dst = ETHERNET_BROADCAST;
+      arp_eth_frame.header.type = EthernetHeader::TYPE_ARP;
+      arp_eth_frame.payload = serialize(arp_msg);
+      outbound_frames.push(arp_eth_frame);
+      
+      arp_life.emplace(addr_numeric, ARP_requese_ttl);
     }
+  }
+  arp_list.emplace_back(next_hop, dgram);
 }
 
 // frame: the incoming Ethernet frame
