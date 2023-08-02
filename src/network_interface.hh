@@ -47,9 +47,9 @@ private:
     EthernetAddress eth_addr;
     size_t ttl;
   }arp_t;
-  std::map<uint32_t, arp_t> arp_table {};
+  std::unordered_map<uint32_t, arp_t> arp_table {};
   std::queue<EthernetFrame> outbound_frames {};
-  std::map<uint32_t, size_t> arp_life {};
+  std::unordered_map<uint32_t, size_t> arp_life {};
   std::list<std::pair<Address, InternetDatagram>> arp_list{};
 
 public:
