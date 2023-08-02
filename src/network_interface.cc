@@ -61,9 +61,9 @@ optional<InternetDatagram> NetworkInterface::recv_frame( const EthernetFrame& fr
   if(frame.header.type == EthernetHeader::TYPE_IPv4){
     InternetDatagram dgram;
     if(not parse(dgram, frame.payload)){
-      return nullopt;
+      return dgram;
     }
-    return dgram;
+    return nulllopt;
   }else if (frame.header.type == EthernetHeader::TYPE_ARP){
     ARPMessage arp_msg;
     if(not parse(arp_msg, frame.payload)){
