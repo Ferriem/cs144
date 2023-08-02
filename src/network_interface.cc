@@ -63,7 +63,7 @@ optional<InternetDatagram> NetworkInterface::recv_frame( const EthernetFrame& fr
     if(not parse(dgram, frame.payload)){
       return dgram;
     }
-    return nulllopt;
+    return nullopt;
   }else if (frame.header.type == EthernetHeader::TYPE_ARP){
     ARPMessage arp_msg;
     if(not parse(arp_msg, frame.payload)){
