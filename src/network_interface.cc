@@ -24,6 +24,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
 {
   uint32_t addr_numeric = next_hop.ipv4_numeric();
 
+
   if(arp_table.contains(addr_numeric)){
     EthernetFrame eth_frame;
     eth_frame.header.src = ethernet_address_;
@@ -49,8 +50,8 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
       
       arp_life.emplace(addr_numeric, ARP_requese_ttl);
     }
+    arp_list.emplace_back(next_hop, dgram);
   }
-  arp_list.emplace_back(std::pair{next_hop, dgram});
 }
 
 // frame: the incoming Ethernet frame
