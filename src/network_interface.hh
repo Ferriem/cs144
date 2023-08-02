@@ -10,6 +10,8 @@
 #include <queue>
 #include <unordered_map>
 #include <utility>
+#include <map>
+#include <set>
 
 // A "network interface" that connects IP (the internet layer, or network layer)
 // with Ethernet (the network access layer, or link layer).
@@ -37,9 +39,17 @@ class NetworkInterface
 private:
   // Ethernet (known as hardware, network-access, or link-layer) address of the interface
   EthernetAddress ethernet_address_;
-
+  size_t ARP_ttl = 30000;
   // IP (known as Internet-layer or network-layer) address of the interface
   Address ip_address_;
+  typedef struct arp{
+    EthernetAddress eth_addr;
+    size_t ttl;
+  }arp_t;
+  std::map<uint32_t, arp_t> arp_table {};
+  std::queue<EthernetFrame> outbound_frames {};
+  std::set<uint32_t> arp_life {};
+  std::list<std::pair<Address, InternetDatagram>> arp_list{};
 
 public:
   // Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer)
