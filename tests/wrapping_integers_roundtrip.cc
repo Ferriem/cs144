@@ -11,7 +11,7 @@ using namespace std;
 
 void check_roundtrip( const Wrap32 isn, const uint64_t value, const uint64_t checkpoint )
 {
-  
+
   if ( Wrap32::wrap( value, isn ).unwrap( isn, checkpoint ) != value ) {
     ostringstream ss;
 
@@ -25,7 +25,7 @@ void check_roundtrip( const Wrap32 isn, const uint64_t value, const uint64_t che
 
 int main()
 {
-  
+
   try {
     auto rd = get_random_engine();
     uniform_int_distribution<uint32_t> dist31minus1 { 0, ( uint32_t { 1 } << 31 ) - 1 };
@@ -33,7 +33,7 @@ int main()
     uniform_int_distribution<uint64_t> dist63 { 0, uint64_t { 1 } << 63 };
 
     const uint64_t big_offset = ( uint64_t { 1 } << 31 ) - 1;
-    
+
     for ( unsigned int i = 0; i < 1000000; i++ ) {
       const Wrap32 isn { dist32( rd ) };
       const uint64_t val { dist63( rd ) };
@@ -46,10 +46,10 @@ int main()
       check_roundtrip( isn, val - offset, val );
       check_roundtrip( isn, val + big_offset, val );
       check_roundtrip( isn, val - big_offset, val );
-      }
     }
-    
-    catch ( const exception& e ) {
+  }
+
+  catch ( const exception& e ) {
     cerr << e.what() << endl;
     return 1;
   }

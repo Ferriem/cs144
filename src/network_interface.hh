@@ -6,12 +6,12 @@
 
 #include <iostream>
 #include <list>
+#include <map>
 #include <optional>
 #include <queue>
+#include <set>
 #include <unordered_map>
 #include <utility>
-#include <map>
-#include <set>
 
 // A "network interface" that connects IP (the internet layer, or network layer)
 // with Ethernet (the network access layer, or link layer).
@@ -38,19 +38,20 @@ class NetworkInterface
 {
 private:
   // Ethernet (known as hardware, network-access, or link-layer) address of the interface
-  EthernetAddress ethernet_address_;
-  size_t ARP_requese_ttl = static_cast<size_t> (5000);
-  size_t ARP_ttl = static_cast<size_t> (30000);
+  EthernetAddress ethernet_address_;                    // MAC address
+  size_t ARP_requese_ttl = static_cast<size_t>( 5000 ); // 5 seconds
+  size_t ARP_ttl = static_cast<size_t>( 30000 );        // 30 seconds
   // IP (known as Internet-layer or network-layer) address of the interface
-  Address ip_address_;
-  typedef struct arp{
+  Address ip_address_; // IP address
+  typedef struct arp
+  {
     EthernetAddress eth_addr;
     size_t ttl;
-  }arp_t;
-  std::unordered_map<uint32_t, arp_t> arp_table {};
-  std::queue<EthernetFrame> outbound_frames {};
-  std::unordered_map<uint32_t, size_t> arp_life {};
-  std::list<std::pair<Address, InternetDatagram>> arp_list{};
+  } arp_t;                                                     // ARP table entry
+  std::unordered_map<uint32_t, arp_t> arp_table {};            // ARP table
+  std::queue<EthernetFrame> outbound_frames {};                // Frames to be sent
+  std::unordered_map<uint32_t, size_t> arp_life {};            // arp request sent table
+  std::list<std::pair<Address, InternetDatagram>> arp_list {}; // arp request sent list, pass time ,resend
 
 public:
   // Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer)

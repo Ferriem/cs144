@@ -9,19 +9,18 @@ class TCPSender
 {
   Wrap32 isn_;
   uint64_t initial_RTO_ms_;
-  uint64_t RTO_ms_ {0};
-  uint64_t timer {0};
-  bool set_syn {false};
-  bool set_fin {false};
-  uint64_t window_size {1};
-  uint64_t out_seqno {0};
-  uint64_t next_abs_seqno {0};
-  uint64_t consecutive_retransmissions_ {0};
+  uint64_t RTO_ms_ { 0 };
+  uint64_t timer { 0 };
+  bool set_syn { false };
+  bool set_fin { false };
+  uint64_t window_size { 1 };
+  uint64_t out_seqno { 0 };
+  uint64_t next_abs_seqno { 0 };
+  uint64_t consecutive_retransmissions_ { 0 };
   std::queue<TCPSenderMessage> message_queue {};
   std::map<uint64_t, TCPSenderMessage> sent_messages {};
-  Wrap32 get_next_seqno() const {return isn_ + next_abs_seqno;}
-  uint64_t get_next_abs_seqno() const {return next_abs_seqno;}
-
+  Wrap32 get_next_seqno() const { return isn_ + next_abs_seqno; }
+  uint64_t get_next_abs_seqno() const { return next_abs_seqno; }
 
 public:
   /* Construct TCP sender with given default Retransmission Timeout and possible ISN */
