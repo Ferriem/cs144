@@ -1,4 +1,4 @@
-v## Check-1
+## Check-1
 
 - [check1.pdf](https://cs144.github.io/assignments/check1.pdf)
 - code branches [reassember](../src/reassember.cc)
