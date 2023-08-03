@@ -1,6 +1,7 @@
 ## Check-3
 
-[check3.pdf](https://cs144.github.io/assignments/check3.pdf)
+- [check3.pdf](https://cs144.github.io/assignments/check3.pdf)
+- code branches [tcp_sender](../src/tcp_sender.cc)
 
 - **Target**: Implement TCPSender
 

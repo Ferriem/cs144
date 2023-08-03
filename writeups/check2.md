@@ -1,6 +1,7 @@
 ## Check-2
 
-[check2.pdf](https://cs144.github.io/assignments/check2.pdf)
+- [check2.pdf](https://cs144.github.io/assignments/check2.pdf)
+- code branches [wrap](../src/wrapping_integers.cc), [tcp_receiver](../src/tcp_receiver.cc)
 
 ### Translate between 64-bit indexes and 32-bit seqnos
 
